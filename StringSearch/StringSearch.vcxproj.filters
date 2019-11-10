@@ -1,0 +1,47 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Naive">
+      <UniqueIdentifier>{fd9cf543-d2d1-48c5-82af-0c4d6f92b504}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Rabin Karp">
+      <UniqueIdentifier>{72b5c20e-49b2-4fdb-9a9a-1958d30da6af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="KMP">
+      <UniqueIdentifier>{30785545-a602-4c14-b52e-88cb7e7dc54d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="BoyerMoore">
+      <UniqueIdentifier>{4ef9600e-8896-4263-8b8e-4c2830d41a02}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Naive.cpp">
+      <Filter>Naive</Filter>
+    </ClCompile>
+    <ClCompile Include="RabinKarp.cpp">
+      <Filter>Rabin Karp</Filter>
+    </ClCompile>
+    <ClCompile Include="KMP.cpp">
+      <Filter>KMP</Filter>
+    </ClCompile>
+    <ClCompile Include="BoyerMoore.cpp">
+      <Filter>BoyerMoore</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Naive.h">
+      <Filter>Naive</Filter>
+    </ClInclude>
+    <ClInclude Include="StringSearch.h" />
+    <ClInclude Include="RabinKarp.h">
+      <Filter>Rabin Karp</Filter>
+    </ClInclude>
+    <ClInclude Include="KMP.h">
+      <Filter>KMP</Filter>
+    </ClInclude>
+    <ClInclude Include="BoyerMoore.h">
+      <Filter>BoyerMoore</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>

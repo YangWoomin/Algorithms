@@ -1,0 +1,64 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Minimum Spanning Tree">
+      <UniqueIdentifier>{ea4b68f2-a78f-42ac-b35b-8169cf087fd8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Common">
+      <UniqueIdentifier>{afb20274-fe49-4e67-b790-aac7bcae2875}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Minimum Spanning Tree\Prim">
+      <UniqueIdentifier>{96d6e3e0-b7c5-47eb-a37d-90426fb80dc5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Minimum Spanning Tree\Kruskal">
+      <UniqueIdentifier>{225dd4f3-28e7-455f-bdf1-1b334ada4f75}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shortest Path">
+      <UniqueIdentifier>{33c9f22e-0f5d-4737-94b5-3b959e3d8d76}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shortest Path\Dijkstra">
+      <UniqueIdentifier>{75ad18e4-61f8-4493-9f48-aa8ada125911}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shortest Path\Floyd">
+      <UniqueIdentifier>{459f5c63-868f-475b-93e7-c5ccc777c070}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Graph.h">
+      <Filter>Common</Filter>
+    </ClInclude>
+    <ClInclude Include="MinimumSpanningTree.h">
+      <Filter>Minimum Spanning Tree</Filter>
+    </ClInclude>
+    <ClInclude Include="Prim.h">
+      <Filter>Minimum Spanning Tree\Prim</Filter>
+    </ClInclude>
+    <ClInclude Include="Kruskal.h">
+      <Filter>Minimum Spanning Tree\Kruskal</Filter>
+    </ClInclude>
+    <ClInclude Include="Dijkstra.h">
+      <Filter>Shortest Path\Dijkstra</Filter>
+    </ClInclude>
+    <ClInclude Include="ShortestPath.h">
+      <Filter>Shortest Path</Filter>
+    </ClInclude>
+    <ClInclude Include="Floyd.h">
+      <Filter>Shortest Path\Floyd</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Prim.cpp">
+      <Filter>Minimum Spanning Tree\Prim</Filter>
+    </ClCompile>
+    <ClCompile Include="Kruskal.cpp">
+      <Filter>Minimum Spanning Tree\Kruskal</Filter>
+    </ClCompile>
+    <ClCompile Include="Dijkstra.cpp">
+      <Filter>Shortest Path\Dijkstra</Filter>
+    </ClCompile>
+    <ClCompile Include="Floyd.cpp">
+      <Filter>Shortest Path\Floyd</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
