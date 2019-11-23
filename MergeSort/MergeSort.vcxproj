@@ -12,8 +12,8 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>
-    <ProjectGuid>{83C6C5DE-54D3-4C24-9643-94DFA48CCECF}</ProjectGuid>
-    <RootNamespace>QuickSort</RootNamespace>
+    <ProjectGuid>{DE0BC98D-2454-40D7-AC1C-0FAF4388A79B}</ProjectGuid>
+    <RootNamespace>MergeSort</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -72,7 +72,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Source.cpp" />
+    <ClCompile Include="Main.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SortCommon\SortCommon.vcxproj">

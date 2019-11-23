@@ -15,6 +15,12 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Graph", "Graph\Graph.vcxpro
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "StringSearch", "StringSearch\StringSearch.vcxproj", "{528F6828-51D9-4DA8-B045-AE7D7B3665F4}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "DevideAndConquer", "DevideAndConquer", "{98BF6B3F-98C8-42B5-BEAE-3F2A9A84A32E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "MergeSort", "MergeSort\MergeSort.vcxproj", "{DE0BC98D-2454-40D7-AC1C-0FAF4388A79B}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "SortCommon", "SortCommon\SortCommon.vcxproj", "{815A2E30-CBC6-4EB9-825F-A0708CBCC7FD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -45,9 +51,20 @@ Global
 		{528F6828-51D9-4DA8-B045-AE7D7B3665F4}.Debug|x64.Build.0 = Debug|x64
 		{528F6828-51D9-4DA8-B045-AE7D7B3665F4}.Release|x64.ActiveCfg = Release|x64
 		{528F6828-51D9-4DA8-B045-AE7D7B3665F4}.Release|x64.Build.0 = Release|x64
+		{DE0BC98D-2454-40D7-AC1C-0FAF4388A79B}.Debug|x64.ActiveCfg = Debug|x64
+		{DE0BC98D-2454-40D7-AC1C-0FAF4388A79B}.Debug|x64.Build.0 = Debug|x64
+		{DE0BC98D-2454-40D7-AC1C-0FAF4388A79B}.Release|x64.ActiveCfg = Release|x64
+		{DE0BC98D-2454-40D7-AC1C-0FAF4388A79B}.Release|x64.Build.0 = Release|x64
+		{815A2E30-CBC6-4EB9-825F-A0708CBCC7FD}.Debug|x64.ActiveCfg = Debug|x64
+		{815A2E30-CBC6-4EB9-825F-A0708CBCC7FD}.Debug|x64.Build.0 = Debug|x64
+		{815A2E30-CBC6-4EB9-825F-A0708CBCC7FD}.Release|x64.ActiveCfg = Release|x64
+		{815A2E30-CBC6-4EB9-825F-A0708CBCC7FD}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{DE0BC98D-2454-40D7-AC1C-0FAF4388A79B} = {98BF6B3F-98C8-42B5-BEAE-3F2A9A84A32E}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {383893A9-48E5-41AF-B36B-024F008679F9}
