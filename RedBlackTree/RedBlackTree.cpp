@@ -49,9 +49,9 @@ void RedBlackTree::show(Node* node, int deepCount)
 void RedBlackTree::reconstructionAfterInsertion(Node* node, bool left)
 {
 	Node* parent = node->_parent;
-	while (nullptr != parent && RED == parent->_color && _root != parent)
+	while (nullptr != parent && RED == parent->_color)
 	{
-		// in loop grand parent must be exist
+		// in loop grand parent must exist
 		Node* grandParent = parent->_parent;
 		bool leftParent = grandParent->_left == parent;
 		Node* uncle = leftParent ? grandParent->_right : grandParent->_left;
@@ -93,7 +93,7 @@ void RedBlackTree::reconstructionAfterDeletion(Node* child, Node* parent)
 		{
 			if (BLACK == sibling->_left->_color && BLACK == sibling->_right->_color)
 			{
-				// case 1-1
+				// case 1
 				// parent : red, sibling : black, sibling left : black, sibling right : black
 				sibling->_color = RED;
 				parent->_color = BLACK;
@@ -104,7 +104,7 @@ void RedBlackTree::reconstructionAfterDeletion(Node* child, Node* parent)
 		{
 			if (BLACK == sibling->_color)
 			{
-				// case 2-1
+				// case 4
 				// parent : black, sibling : black, sibling left : black, sibling right : black
 				sibling->_color = RED;
 				child = parent;
@@ -113,7 +113,7 @@ void RedBlackTree::reconstructionAfterDeletion(Node* child, Node* parent)
 			}
 			else // RED == sibling->_color
 			{
-				// case 2-2
+				// case 5
 				// parent : black, sibling : red, sibling left : black, sibling right : black
 				parent->_color = RED;
 				sibling->_color = BLACK;
@@ -135,7 +135,7 @@ void RedBlackTree::reconstructionAfterDeletion(Node* child, Node* parent)
 			((left && RED == sibling->_left->_color && BLACK == sibling->_right->_color)
 				|| (!left && BLACK == sibling->_left->_color && RED == sibling->_right->_color)))
 		{
-			// case 1-3
+			// case 3
 			// parent : all, sibling : black, sibling left : red, sibling right : black
 			if (left)
 			{
@@ -155,7 +155,7 @@ void RedBlackTree::reconstructionAfterDeletion(Node* child, Node* parent)
 		
 		if (BLACK == sibling->_color && ((left && RED == sibling->_right->_color) || (!left && RED == sibling->_left->_color)))
 		{
-			// case 1-2
+			// case 2
 			// parent : all, sibling : black, sibling left : all, sibling right : red
 			left ? leftRotate(parent) : rightRotate(parent);
 			sibling->_color = parent->_color;
