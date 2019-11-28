@@ -85,7 +85,7 @@ void RedBlackTree::reconstructionAfterInsertion(Node* node, bool left)
 
 void RedBlackTree::reconstructionAfterDeletion(Node* child, Node* parent)
 {
-	while (_root != child)
+	while (nullptr != parent)
 	{
 		bool left = parent->_left == child;
 		Node* sibling = left ? parent->_right : parent->_left;
@@ -158,8 +158,10 @@ void RedBlackTree::reconstructionAfterDeletion(Node* child, Node* parent)
 			// case 2
 			// parent : all, sibling : black, sibling left : all, sibling right : red
 			left ? leftRotate(parent) : rightRotate(parent);
-			sibling->_color = parent->_color;
-			parent->_color = BLACK;
+			NODE_COLOR temp = parent->_color;
+			parent->_color = sibling->_color;
+			sibling->_color = temp;
+			left ? sibling->_right->_color = BLACK : sibling->_left->_color = BLACK;
 			break; 
 		}
 	}
@@ -237,14 +239,8 @@ bool RedBlackTree::checkNil(Node* node)
 bool RedBlackTree::checkRedNode(Node* node)
 {
 	if (RED == node->_color)
-	{
-		if (nullptr == node->_left && nullptr == node->_right)
+		if (BLACK != node->_left->_color || BLACK != node->_right->_color)
 			return false;
-		if (nullptr != node->_left && BLACK != node->_left->_color)
-			return false;
-		if (nullptr != node->_right && BLACK != node->_right->_color)
-			return false;
-	}
 
 	bool ret = true;
 
@@ -284,6 +280,7 @@ RedBlackTree::RedBlackTree(fnCompare comparer, fnShow shower)
 	: _root(nullptr), _comparer(comparer), _shower(shower)
 {
 	_nil = new Node(None, nullptr, BLACK, true);
+	_root = _nil;
 }
 
 RedBlackTree::~RedBlackTree()
@@ -312,7 +309,7 @@ bool RedBlackTree::Insert(TreeValue value)
 	if (nullptr == _nil)
 		return false;
 
-	if (nullptr == _root)
+	if (_nil == _root)
 	{
 		_root = new Node(value, nullptr, BLACK);
 		if (nullptr == _root)
@@ -333,10 +330,13 @@ bool RedBlackTree::Insert(TreeValue value)
 				return false;
 			found->_left = _nil;
 			found->_right = _nil;
-			if (0 < comp)
-				parent->_right = found;
-			else
-				parent->_left = found;
+			if (nullptr != parent)
+			{
+				if (0 < comp)
+					parent->_right = found;
+				else
+					parent->_left = found;
+			}
 			reconstructionAfterInsertion(found, 0 > comp);
 			return true;
 		}
@@ -349,7 +349,7 @@ bool RedBlackTree::Insert(TreeValue value)
 
 bool RedBlackTree::Delete(TreeValue value)
 {
-	if (nullptr == _root)
+	if (_nil == _root)
 		return false;
 
 	Node* parent = nullptr;
@@ -358,14 +358,15 @@ bool RedBlackTree::Delete(TreeValue value)
 	if (_nil == found)
 		return false;
 
-	Node** toChild = nullptr == parent ? &_root : found == parent->_left ? &(parent->_left) : &(parent->_right);
+	Node** parentChild = nullptr == parent ? &_root : found == parent->_left ? &(parent->_left) : &(parent->_right);
 	Node* child = found->_left != _nil ? found->_left : found->_right;
-	NODE_COLOR deleteNodeColor = RED;
+	NODE_COLOR deleteNodeColor = BLACK;
 	if (_nil == found->_left || _nil == found->_right)
 	{
 		if(_nil != child)
 			child->_parent = parent;
-		*toChild = child;
+		*parentChild = child;
+		
 		deleteNodeColor = found->_color;
 	}
 	else
@@ -374,7 +375,7 @@ bool RedBlackTree::Delete(TreeValue value)
 			child = child->_right;
 		Node* childParent = child->_parent;
 
-		*toChild = child;
+		*parentChild = child;
 		child->_parent = parent;
 		child->_right = found->_right;
 		child->_right->_parent = child;
@@ -384,17 +385,13 @@ bool RedBlackTree::Delete(TreeValue value)
 
 		if (childParent != found)
 		{
+			childParent->_right = child->_left;
 			if (_nil != child->_left)
-			{
-				childParent->_right = child->_left;
 				child->_left->_parent = childParent;
-			}
-			else
-				childParent->_right = _nil;
 
 			child->_left = found->_left;
 			child->_left->_parent = child;
-			
+
 			// restore for reconstructionAfterDeletion
 			child = childParent->_right;
 			parent = childParent;
@@ -433,7 +430,7 @@ void RedBlackTree::Show()
 
 bool RedBlackTree::CheckIntegrity()
 {
-	if (nullptr == _root)
+	if (_nil == _root)
 		return true;
 
 	if (RED == _root->_color)
