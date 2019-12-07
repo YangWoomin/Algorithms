@@ -44,14 +44,14 @@ void Prim::DoAlgorithm(std::size_t vertexNum)
 			if (t != vertexNum && INFINITY_VALUE != _weights[vertexNum][t])
 				queue.Push(new Edge(vertexNum, t, _weights[vertexNum][t]));
 
-		std::size_t order = 1;
+		std::size_t order = 0;
 		Edge* edge = nullptr;
-		while (nullptr != (edge = (Edge*)queue.Pop()))
+		while (nullptr != (edge = (Edge*)queue.Pop()) && order < _vertexCount)
 		{
 			if (TO_BE_CHECKED == check[edge->to])
 			{
 				check[edge->to] = CHECKED;
-				_result[edge->from][edge->to] = order++;
+				_result[edge->from][edge->to] = ++order;
 				for (std::size_t t = 0; t < _vertexCount; ++t)
 					if (t != edge->to && INFINITY_VALUE != _weights[edge->to][t])
 						if (TO_BE_CHECKED == check[t])
@@ -59,6 +59,9 @@ void Prim::DoAlgorithm(std::size_t vertexNum)
 			}
 			delete edge;
 		}
+
+		while (nullptr != (edge = (Edge*)queue.Pop()))
+			delete edge;
 
 		delete[] check;
 

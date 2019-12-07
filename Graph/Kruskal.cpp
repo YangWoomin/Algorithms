@@ -43,11 +43,11 @@ void Kruskal::DoAlgorithm(std::size_t vertexNum)
 			}
 		}
 
-		std::size_t order = 1;
+		std::size_t order = 0;
 		Edge* edge = nullptr;
 		_result = *this;
 		_result.Reset();
-		while (nullptr != (edge = (Edge*)queue.Pop()))
+		while (nullptr != (edge = (Edge*)queue.Pop()) && order < _vertexCount)
 		{
 			SetTree* from = &setTrees[edge->from];
 			while (nullptr != from->parent)
@@ -57,11 +57,14 @@ void Kruskal::DoAlgorithm(std::size_t vertexNum)
 				to = to->parent;
 			if (from->setNum != to->setNum)
 			{
-				_result[edge->from][edge->to] = order++;
+				_result[edge->from][edge->to] = ++order;
 				to->parent = from;
 			}
 			delete edge;
 		}
+
+		while (nullptr != (edge = (Edge*)queue.Pop()))
+			delete edge;
 
 		delete[] setTrees;
 	}

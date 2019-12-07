@@ -11,14 +11,17 @@ int main()
 	prim.DoAlgorithm(1);
 	prim.Show();
 
-	Kruskal kruskal = (Graph*)&prim;
+	Kruskal kruskal = (Graph*)& prim;
 	kruskal.DoAlgorithm(0);
 	kruskal.Show();
 
 	if (true == kruskal.IsSame((MinimumSpanningTree*)& prim))
 		std::cout << "prim and kruskal result is same!" << std::endl;
 	else
+	{
 		std::cout << "prim and kruskal result is different!" << std::endl;
+		return -1;
+	}
 
 	std::cout << std::endl;
 
@@ -43,6 +46,7 @@ int main()
 		else
 		{
 			std::cout << "dijkstra and floyd result is different!" << std::endl;
+			return -2;
 		}
 	}
 	
