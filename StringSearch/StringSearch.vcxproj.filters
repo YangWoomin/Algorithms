@@ -43,5 +43,6 @@
     <ClInclude Include="BoyerMoore.h">
       <Filter>BoyerMoore</Filter>
     </ClInclude>
+    <ClInclude Include="StringSearchSimulator.h" />
   </ItemGroup>
 </Project>

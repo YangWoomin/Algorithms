@@ -2,6 +2,11 @@
 #include <vector>
 #include <climits>
 
+BoyerMoore::BoyerMoore()
+{
+
+}
+
 BoyerMoore::BoyerMoore(std::string haystack)
 	: StringSearch(haystack)
 {

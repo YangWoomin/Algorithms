@@ -1,6 +1,11 @@
 #include "KMP.h"
 #include <vector>
 
+KMP::KMP()
+{
+
+}
+
 KMP::KMP(std::string haystack)
 	: StringSearch(haystack)
 {

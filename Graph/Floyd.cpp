@@ -34,7 +34,7 @@ void Floyd::DoAlgorithm(std::size_t vertexNum)
 	{
 		Graph totalCost = *this;
 		Graph path = *this;
-		path.Reset(-1);
+		path.Reset(INFINITY_VALUE);
 
 		for (std::size_t i = 0; i < _vertexCount; ++i)
 		{

@@ -1,5 +1,10 @@
 #include "Naive.h"
 
+Naive::Naive()
+{
+
+}
+
 Naive::Naive(std::string haystack)
 	: StringSearch(haystack)
 {

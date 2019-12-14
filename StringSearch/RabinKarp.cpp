@@ -3,6 +3,11 @@
 #include <cstddef>
 #include <cmath>
 
+RabinKarp::RabinKarp()
+{
+
+}
+
 RabinKarp::RabinKarp(std::string haystack)
 	: StringSearch(haystack)
 {

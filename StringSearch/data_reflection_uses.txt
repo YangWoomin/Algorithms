@@ -1,0 +1,15 @@
+Reflection helps programmers make generic software libraries to display data, process different formats of data, perform serialization or deserialization of data for communication, or do bundling and unbundling of data for containers or bursts of communication.
+
+Effective use of reflection almost always requires a plan: A design framework, encoding description, object library, a map of a database or entity relations.
+
+Reflection makes a language more suited to network-oriented code. For example, it assists languages such as Java to operate well in networks by enabling libraries for serialization, bundling and varying data formats. Languages without reflection (e.g. C) have to use auxiliary compilers, e.g. for Abstract Syntax Notation, to produce code for serialization and bundling.
+
+Reflection can be used for observing and modifying program execution at runtime. A reflection-oriented program component can monitor the execution of an enclosure of code and can modify itself according to a desired goal related to that enclosure. This is typically accomplished by dynamically assigning program code at runtime.
+
+In object-oriented programming languages such as Java, reflection allows inspection of classes, interfaces, fields and methods at runtime without knowing the names of the interfaces, fields, methods at compile time. It also allows instantiation of new objects and invocation of methods.
+
+Reflection is often used as part of software testing, such as for the runtime creation/instantiation of mock objects.
+
+Reflection is also a key strategy for metaprogramming.
+
+In some object-oriented programming languages, such as C# and Java, reflection can be used to bypass member accessibility rules. For C#-properties this can be achieved by writing directly onto the (usually invisible) backing field of a non-public property. It is also possible to find non-public methods of classes and types and manually invoke them. This works for project-internal files as well as external libraries (.Net-assemblies and Java-archives).
