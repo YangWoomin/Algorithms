@@ -5,7 +5,7 @@
 class RabinKarp : public StringSearch
 {
 private:
-	std::size_t MakeHash(std::size_t beforeHash, const char* beforeFirstChar, std::string haystack, std::size_t patterSize);
+	std::size_t MakeHash(std::size_t index, std::size_t beforeHash, std::string& haystack, std::size_t patternSize);
 
 public:
 	RabinKarp();
