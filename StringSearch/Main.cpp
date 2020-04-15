@@ -11,8 +11,12 @@ using namespace std;
 
 int main(int argc, char** argv)
 {
-	if (3 != argc)
+	if (3 > argc || 4 < argc)
 	{
+		std::cout << "[Usage]" << std::endl;
+		std::cout << " arg1 : simulation count (essential)" << std::endl;
+		std::cout << " arg2 : haystack file path (essential)" << std::endl;
+		std::cout << " arg3 : pattern (optional)" << std::endl;
 		return -1;
 	}
 
@@ -26,13 +30,19 @@ int main(int argc, char** argv)
 	while (getline(file, temp))
 		haystack += temp;
 
+	std::string pattern = "";
+	if (4 == argc)
+	{
+		pattern = argv[3];
+	}
+
 	StringSearchSimulator simulator;
 	simulator.AddStringSearch("Naive", new Naive());
 	simulator.AddStringSearch("RabinKarp", new RabinKarp());
 	simulator.AddStringSearch("KMP", new KMP());
 	simulator.AddStringSearch("BoyerMoore", new BoyerMoore());
 
-	if (true == simulator.DoSimulate(haystack, simulationCount, true)) 
+	if (true == simulator.DoSimulate(haystack, pattern, simulationCount, true)) 
 		std::cout << "simulating succeeded" << std::endl;
 	else
 		std::cout << "simulating failed" << std::endl;

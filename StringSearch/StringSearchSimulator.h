@@ -38,7 +38,7 @@ public:
 		return false;
 	}
 
-	bool DoSimulate(std::string haystack, std::size_t simulationCount, bool showLog)
+	bool DoSimulate(std::string haystack, std::string pattern, std::size_t simulationCount, bool showLog)
 	{
 		if (0 >= stringSearches.size())
 			return false;
@@ -53,29 +53,28 @@ public:
 
 		for (std::size_t i = 0; i < simulationCount; ++i)
 		{
-			std::string pattern;
-			while (true)
+			std::string pat = pattern;
+			while (true == pat.empty() || " " == pat)
 			{
 				std::size_t randIndex = (std::size_t)rand() % haystack.size();
-				std::string temp = haystack.substr(randIndex);
-				std::size_t endIndex1 = temp.find(" ") + randIndex;
-				temp = haystack.substr(0, randIndex);
-				std::size_t endIndex2 = temp.rfind(" ");
-				if (std::string::npos == endIndex1 || std::string::npos == endIndex2)
+				if (' ' == haystack[randIndex])
 					continue;
-				pattern = haystack.substr(endIndex2, endIndex1 - endIndex2 + 1);
-				if (false == pattern.empty() && " " != pattern)
-					break;
+				std::string temp = haystack.substr(randIndex);
+				std::size_t rightSpaceIndex = temp.find(" ");
+				if (std::string::npos == rightSpaceIndex)
+					pat = temp;
+				else
+					pat = haystack.substr(randIndex, rightSpaceIndex);
 			}
 			
 			if (showLog)
-				std::cout << "[" << i + 1 << "] pattern : " << pattern << std::endl;
+				std::cout << "[" << i + 1 << "] pattern : " << pat << std::endl;
 
 			itCursor = stringSearches.begin();
 			std::size_t index = std::string::npos;
 			for (; itCursor != itFinish; ++itCursor)
 			{
-				std::size_t ret = itCursor->second->FindString(pattern);
+				std::size_t ret = itCursor->second->FindString(pat);
 				if (std::string::npos == index)
 					index = ret;
 				else if (ret != index)
