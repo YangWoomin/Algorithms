@@ -29,7 +29,7 @@ std::size_t KMP::FindString(std::string pattern, std::size_t startIndex)
 				if (pattern[index] != pattern[(std::size_t)i - 1 - j + index])
 					break;
 			if (index > j)
-				skipInfo[i] = (std::size_t)i - (j + 1);
+				skipInfo[i] = i - ((std::size_t)j + 1);
 		}
 		if (0 == skipInfo[i])
 			skipInfo[i] = 2 > i ? 1 : i;

@@ -19,42 +19,63 @@ std::size_t BoyerMoore::FindString(std::string pattern, std::size_t startIndex)
 		return std::string::npos;
 
 	std::string haystack = this->haystack.substr(startIndex);
-
 	const std::size_t patternSize = pattern.size();
+
+	// preprocessing for bad char table
 	std::vector<std::size_t> badCharTable(CHAR_MAX + 1, patternSize);
 	for (std::size_t i = 0; i < patternSize; ++i)
 		badCharTable[pattern[i]] = i;
 	
+	// preprocessing for good suffix table 1
+	// good suffix table 1 index : incorrect index
+	// good suffix table 1 value : left good suffix index
 	std::vector<std::size_t> goodSuffixTable1(patternSize, patternSize);
 	std::size_t index = 0;
+	// i : beginning index of right good suffix
 	for (std::size_t i = 1; i < patternSize; ++i)
 	{
-		for (std::size_t j = 0; j < i; ++j)
+		// j : index for finding left good suffix
+		for (std::size_t j = 0; j < i; ++j) 
 		{
-			for (index = j; index < patternSize - i; ++index)
-				if (pattern[index] != pattern[i + index])
+			// index : index for comparing those strings
+			for (index = 0; index < patternSize - i; ++index)
+				if (pattern[j + index] != pattern[i + index])
 					break;
 			if (patternSize - i == index)
 				goodSuffixTable1[i - 1] = j;
 		}
 	}
 
+	// preprocessing  for good suffix table 2
+	// good suffix table 2 index : incorrect index
+	// good suffix table 2 value : suffix index of the longest border
 	std::vector<std::size_t> goodSuffixTable2(patternSize, patternSize);
+	// i : border length
 	for (std::size_t i = 1; i < patternSize; ++i)
 	{
-		for (index = 0; index < i; ++index)
-			if (pattern[index] != pattern[patternSize - i + index])
+		std::size_t beginningIdxOfPfx = 0;
+		const std::size_t beginningIdxOfSfx = patternSize - i;
+		for (; beginningIdxOfPfx < i; ++beginningIdxOfPfx)
+			if (pattern[beginningIdxOfPfx] != pattern[beginningIdxOfSfx + beginningIdxOfPfx])
 				break;
-		if (i == index)
-			goodSuffixTable2[patternSize - i - 1] = patternSize - i;
+		if (i == beginningIdxOfPfx)
+			goodSuffixTable2[beginningIdxOfSfx - 1] = beginningIdxOfSfx;
 		else
-			for (std::size_t j = patternSize - i; j < patternSize; ++j)
+		{
+			// j : index for finding suffix index of the longest border
+			for (std::size_t j = beginningIdxOfSfx; j < patternSize; ++j)
+			{
 				if (patternSize != goodSuffixTable2[j])
-					goodSuffixTable2[patternSize - i - 1] = goodSuffixTable2[j];
+				{
+					goodSuffixTable2[beginningIdxOfSfx - 1] = goodSuffixTable2[j];
+					break;
+				}
+			}
+		}
 	}
 
 	int idx = 0;
-	std::size_t i = 0, badCharIdx, goodSfxIdx;
+	std::size_t i = 0, badCharIdx, leftGoodSfxIdx;
 	while (i <= haystack.size() - patternSize)
 	{
 		for (idx = (int)(patternSize - 1); idx >= 0; --idx)
@@ -67,20 +88,15 @@ std::size_t BoyerMoore::FindString(std::string pattern, std::size_t startIndex)
 			i += ((std::size_t)idx + 1);
 		else
 		{
-			goodSfxIdx = goodSuffixTable1[idx];
-			if (badCharIdx < idx && badCharIdx < goodSfxIdx)
+			leftGoodSfxIdx = goodSuffixTable1[idx];
+			if (badCharIdx < idx && badCharIdx < leftGoodSfxIdx)
 			{
 				i += (idx - badCharIdx);
 				continue;
 			}
-			else if (patternSize > goodSfxIdx)
+			else if (patternSize > leftGoodSfxIdx)
 			{
-				if (0 < goodSfxIdx && haystack[i + index] != pattern[goodSfxIdx - 1])
-				{
-					i += goodSuffixTable2[idx];
-					continue;
-				}
-				i += goodSuffixTable1[idx];
+				i += ((std::size_t)idx + 1 - leftGoodSfxIdx);
 				continue;
 			}
 
