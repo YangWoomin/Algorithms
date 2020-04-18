@@ -83,25 +83,19 @@ std::size_t BoyerMoore::FindString(std::string pattern, std::size_t startIndex)
 				break;
 		if (0 > idx)
 			return startIndex + i;
-		badCharIdx = badCharTable[haystack[i + idx]];
-		if (patternSize == badCharIdx) // cannot find bad char in pattern
-			i += ((std::size_t)idx + 1);
-		else
-		{
-			leftGoodSfxIdx = goodSuffixTable1[idx];
-			if (badCharIdx < idx && badCharIdx < leftGoodSfxIdx)
-			{
-				i += (idx - badCharIdx);
-				continue;
-			}
-			else if (patternSize > leftGoodSfxIdx)
-			{
-				i += ((std::size_t)idx + 1 - leftGoodSfxIdx);
-				continue;
-			}
 
-			i += goodSuffixTable2[idx];
+		badCharIdx = badCharTable[haystack[i + idx]];
+		leftGoodSfxIdx = goodSuffixTable1[idx];
+
+		if (badCharIdx < idx)
+		{
+			if (badCharIdx <= leftGoodSfxIdx)
+				i += (idx - badCharIdx);
+			else
+				i += ((std::size_t)idx + 1 - leftGoodSfxIdx);
 		}
+		else
+			i += goodSuffixTable2[idx];
 	}
 
 	return std::string::npos;
