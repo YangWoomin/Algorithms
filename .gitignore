@@ -1,17 +1,5 @@
 
 .vs/
 x64/
-BinaryTree/x64
-Graph/x64
-PriorityQueue/x64
-QuickSort/x64
-RedBlackTree/x64
-StringSearch/x64
-BinaryTree/BinaryTree.vcxproj.user
-PriorityQueue/PriorityQueue.vcxproj.user
-QuickSort/QuickSort.vcxproj.user
-RedBlackTree/RedBlackTree.vcxproj.user
-StringSearch/StringSearch.vcxproj.user
-Graph/Graph.vcxproj.user
-MergeSort/MergeSort.vcxproj.user
-SortCommon/SortCommon.vcxproj.user
+*.user
+
