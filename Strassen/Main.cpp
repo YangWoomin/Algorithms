@@ -330,9 +330,46 @@ private:
 	}
 };
 
+int** MultiplyMatrix(int** A, int** B, std::size_t n)
+{
+	int** C = new int*[n];
+
+	int sum = 0;
+	for (std::size_t i = 0; i < n; ++i)
+	{
+		C[i] = new int[n];
+
+		for (std::size_t j = 0; j < n; ++j)
+		{
+			sum = 0;
+			for (std::size_t k = 0; k < n; ++k)
+			{
+				sum += (A[i][k] * B[k][j]);
+			}
+			C[i][j] = sum;
+		}
+	}
+
+	return C;
+}
+
+void PrintMatrix(int** matrix, std::size_t n)
+{
+	std::cout << "------------------------------------";
+	for (std::size_t i = 0; i < n; ++i)
+	{
+		std::cout << std::endl;
+		for (std::size_t j = 0; j < n; ++j)
+		{
+			std::cout << std::setw(5) << matrix[i][j] << " ";
+		}
+	}
+	std::cout << std::endl << "------------------------------------" << std::endl;
+}
+
 int main()
 {
-	for (std::size_t i = 0; i < 100000; ++i)
+	/*for (std::size_t i = 0; i < 100000; ++i)
 	{
 		Matrix A(4, -10, 10);
 		Matrix B(4, -10, 10);
@@ -358,7 +395,40 @@ int main()
 			std::cout << "Strassen failed." << std::endl;
 			break;
 		}
+	}*/
+
+	std::size_t n = 4;
+	int** A = new int* [n];
+	int** B = new int* [n];
+
+	for (std::size_t i = 0; i < n; ++i)
+	{
+		A[i] = new int[n];
+		B[i] = new int[n];
+
+		for (std::size_t j = 0; j < n; ++j)
+		{
+			A[i][j] = MakeRandomNum(-10, 10);
+			B[i][j] = MakeRandomNum(-10, 10);
+		}
 	}
+
+	PrintMatrix(A, n);
+	PrintMatrix(B, n);
+
+	int** C = MultiplyMatrix(A, B, n);
+
+	PrintMatrix(C, n);
+
+	for (std::size_t i = 0; i < n; ++i)
+	{
+		delete[] A[i];
+		delete[] B[i];
+		delete[] C[i];
+	}
+	delete[] A;
+	delete[] B;
+	delete[] C;
 
 	return 0;
 }
