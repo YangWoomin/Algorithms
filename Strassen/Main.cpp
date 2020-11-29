@@ -373,7 +373,7 @@ void PrintMatrix(int** matrix, std::size_t n)
 
 int main()
 {
-	std::size_t n = 1024;
+	std::size_t n = 256;
 	Matrix A_1(n, -10, 10);
 	Matrix A_2 = A_1;
 	Matrix B(n, -10, 10);
@@ -405,10 +405,10 @@ int main()
 	strassenThread.join();
 
 	std::cout << "** Performance count finished." << std::endl;
-	std::chrono::microseconds naiveMicSec = naivePC.GetDuration<std::chrono::microseconds>();
-	std::cout << "** Naive duration time : " << naiveMicSec.count() << " (usec)" << std::endl;
-	std::chrono::microseconds strassenMicSec = strassenPC.GetDuration<std::chrono::microseconds>();
-	std::cout << "** Strassen duration time : " << strassenMicSec.count() << " (usec)" << std::endl;
+	std::chrono::duration<double> naiveSec = naivePC.GetDuration<std::chrono::duration<double>>();
+	std::cout << "** Naive duration time : " << naiveSec.count() << " sec" << std::endl;
+	std::chrono::duration<double> strassenSec = strassenPC.GetDuration<std::chrono::duration<double>>();
+	std::cout << "** Strassen duration time : " << strassenSec.count() << " sec" << std::endl;
 
 	if (naive == strassen)
 	{
