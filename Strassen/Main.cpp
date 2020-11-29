@@ -4,6 +4,9 @@
 #include <ctime>
 #include <string>
 #include <cmath>
+#include <thread>
+
+#include "../Utils/PerformanceCounter/RunningTime.h"
 
 int MakeRandomNum(int min, int max)
 {
@@ -129,6 +132,7 @@ public:
 	{
 		Reset();
 		Copy(other);
+		return *this;
 	}
 
 	virtual ~Matrix()
@@ -369,34 +373,59 @@ void PrintMatrix(int** matrix, std::size_t n)
 
 int main()
 {
-	/*for (std::size_t i = 0; i < 100000; ++i)
+	std::size_t n = 1024;
+	Matrix A_1(n, -10, 10);
+	Matrix A_2 = A_1;
+	Matrix B(n, -10, 10);
+	Matrix naive(n);
+	Matrix strassen(n);
+
+	//std::cout << "** Matrix A" << std::endl;
+	//A_1.Print(5);
+	//std::cout << "** Matrix B" << std::endl;
+	//B.Print(5);
+
+	A_2.SetUseStrassen(true);
+
+	PC_RunningTime naivePC;
+	PC_RunningTime strassenPC;
+
+	auto run = [](PC_RunningTime* rt, Matrix* A, Matrix* B, Matrix* C) {
+		rt->Start();
+		*C = (*A) * (*B);
+		rt->End();
+	};
+
+	std::cout << "** Performance count started." << std::endl;
+
+	std::thread naiveThread(run, &naivePC, &A_1, &B, &naive);
+	std::thread strassenThread(run, &strassenPC, &A_2, &B, &strassen);
+
+	naiveThread.join();
+	strassenThread.join();
+
+	std::cout << "** Performance count finished." << std::endl;
+	std::chrono::microseconds naiveMicSec = naivePC.GetDuration<std::chrono::microseconds>();
+	std::cout << "** Naive duration time : " << naiveMicSec.count() << " (usec)" << std::endl;
+	std::chrono::microseconds strassenMicSec = strassenPC.GetDuration<std::chrono::microseconds>();
+	std::cout << "** Strassen duration time : " << strassenMicSec.count() << " (usec)" << std::endl;
+
+	if (naive == strassen)
 	{
-		Matrix A(4, -10, 10);
-		Matrix B(4, -10, 10);
+		std::cout << "** Result : same (succeeded)" << std::endl;
+		//std::cout << "** Matrix strassen" << std::endl;
+		//strassen.Print(5);
+	}
+	else
+	{
+		std::cout << "** result : different (failed)" << std::endl;
+		//std::cout << "** Matrix naive" << std::endl;
+		//naive.Print(5);
+		//std::cout << "** Matrix strassen" << std::endl;
+		//strassen.Print(5);
+	}
 
-		A.Print(5);
-		B.Print(5);
-
-		A.SetUseStrassen(true);
-		Matrix C = A * B;
-
-		A.SetUseStrassen(false);
-		Matrix D = A * B;
-
-		C.Print(5);
-		D.Print(5);
-
-		if (C == D)
-		{
-			std::cout << "Strassen succeeded." << std::endl;
-		}
-		else
-		{
-			std::cout << "Strassen failed." << std::endl;
-			break;
-		}
-	}*/
-
+	/*
 	std::size_t n = 4;
 	int** A = new int* [n];
 	int** B = new int* [n];
@@ -429,6 +458,7 @@ int main()
 	delete[] A;
 	delete[] B;
 	delete[] C;
+	*/
 
 	return 0;
 }
