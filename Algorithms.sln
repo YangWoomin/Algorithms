@@ -27,6 +27,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Utils", "Utils", "{8550A9C5
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PerformanceCounter", "Utils\PerformanceCounter\PerformanceCounter.vcxproj", "{D4A44F27-9629-48FC-92A2-0F1DC35967A2}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Progress", "Utils\Progress\Progress.vcxproj", "{022B2C08-0EF6-41F2-B4BD-D706B2EDE7AE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -73,6 +75,10 @@ Global
 		{D4A44F27-9629-48FC-92A2-0F1DC35967A2}.Debug|x64.Build.0 = Debug|x64
 		{D4A44F27-9629-48FC-92A2-0F1DC35967A2}.Release|x64.ActiveCfg = Release|x64
 		{D4A44F27-9629-48FC-92A2-0F1DC35967A2}.Release|x64.Build.0 = Release|x64
+		{022B2C08-0EF6-41F2-B4BD-D706B2EDE7AE}.Debug|x64.ActiveCfg = Debug|x64
+		{022B2C08-0EF6-41F2-B4BD-D706B2EDE7AE}.Debug|x64.Build.0 = Debug|x64
+		{022B2C08-0EF6-41F2-B4BD-D706B2EDE7AE}.Release|x64.ActiveCfg = Release|x64
+		{022B2C08-0EF6-41F2-B4BD-D706B2EDE7AE}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -81,6 +87,7 @@ Global
 		{DE0BC98D-2454-40D7-AC1C-0FAF4388A79B} = {98BF6B3F-98C8-42B5-BEAE-3F2A9A84A32E}
 		{BCC97E42-E971-448D-85DC-9BEC4E5E33DA} = {98BF6B3F-98C8-42B5-BEAE-3F2A9A84A32E}
 		{D4A44F27-9629-48FC-92A2-0F1DC35967A2} = {8550A9C5-501D-446E-9E1E-BF2EB43D1DD0}
+		{022B2C08-0EF6-41F2-B4BD-D706B2EDE7AE} = {8550A9C5-501D-446E-9E1E-BF2EB43D1DD0}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {383893A9-48E5-41AF-B36B-024F008679F9}

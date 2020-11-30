@@ -5,9 +5,9 @@
 #include <string>
 #include <cmath>
 #include <thread>
-#include <mutex>
 
-#include "../Utils/PerformanceCounter/RunningTime.h"
+#include "../Utils/PerformanceCounter/RunningTimeCounter.h"
+#include "../Utils/Progress/Progress.h"
 
 int MakeRandomNum(int min, int max)
 {
@@ -33,9 +33,7 @@ private:
 	Value** _values = nullptr;
 	std::size_t _size = 0;
 	std::size_t _n = 0;
-
 	bool _useStrassen = false;
-	std::mutex* _lock = nullptr;
 	std::string _name;
 
 	void SetSizeToPowOf2()
@@ -64,8 +62,6 @@ private:
 		_size = 0;
 		_n = 0;
 		_useStrassen = false;
-		_name = "";
-		_lock = nullptr;
 	}
 
 	void Copy(const Matrix& other)
@@ -74,7 +70,6 @@ private:
 		_n = other._n;
 		_useStrassen = other._useStrassen;
 		_name = other._name;
-		_lock = other._lock;
 
 		_values = new Value * [_size];
 		for (std::size_t i = 0; i < _size; ++i)
@@ -179,12 +174,8 @@ public:
 						sum += (temp[i][k] * other[k][j]);
 					}
 					(*this)[i][j] = sum;
-				}
 
-				if (nullptr != _lock)
-				{
-					std::lock_guard<std::mutex> guard(*_lock);
-					std::cout << "** Progress of " << (_name.empty() ? "empty" : _name.c_str()) << " : " << (double)i / _size << std::endl;
+					Progress::Proceed(_name, 1);
 				}
 			}
 		}
@@ -206,11 +197,6 @@ public:
 	void SetUseStrassen(bool value)
 	{
 		_useStrassen = value;
-	}
-
-	void SetLock(std::mutex* lock)
-	{
-		_lock = lock;
 	}
 
 	void SetName(std::string name)
@@ -253,6 +239,7 @@ public:
 	{
 		_n = _size = size;
 		_useStrassen = other._useStrassen; // it must be true
+		_name = other._name;
 
 		_values = new Value * [_size];
 		for (std::size_t i = 0; i < _size; ++i)
@@ -269,6 +256,7 @@ public:
 	{
 		_n = _size = size;
 		_useStrassen = other._useStrassen;
+		_name = other._name;
 
 		_values = new Value * [_size];
 		for (std::size_t i = 0; i < _size; ++i)
@@ -357,6 +345,7 @@ public:
 		else
 		{
 			_values[thisRow][thisCol] *= other[otherRow][otherCol];
+			Progress::Proceed(_name, 1);
 		}
 	}
 
@@ -405,7 +394,7 @@ void PrintMatrix(int** matrix, std::size_t n)
 
 int main()
 {
-	std::size_t n = 1024 * 16;
+	std::size_t n = 256;
 	Matrix A_1(n, -10, 10);
 	Matrix A_2 = A_1;
 	Matrix B_1(n, -10, 10);
@@ -418,35 +407,48 @@ int main()
 	//std::cout << "** Matrix B" << std::endl;
 	//B_1.Print(5);
 
-	std::mutex lock;
-	//A_1.SetName("naive A");
-	//B_1.SetName("naive B");
-	//A_1.SetLock(&lock);
-	//B_1.SetLock(&lock);
+	// progress
+	std::string naiveName = "naive";
+	std::string strassenName = "strassen";
+	A_1.SetName(naiveName);
+	B_1.SetName(naiveName);
+	A_2.SetName(strassenName);
+	B_2.SetName(strassenName);
+
+	Progress::Create(naiveName, n * n, n * n / 100);
+	std::size_t strassenMax = (std::size_t)std::pow(7, std::log2(n)) + 1;
+	Progress::Create(strassenName, strassenMax, strassenMax / 100);
+	Progress::Initiate();
 
 	A_2.SetUseStrassen(true);
 	B_2.SetUseStrassen(true);
 
-	PC_RunningTime naiveRT;
+	RunningTimeCounter naiveRTC;
 
-	auto run = [](std::string name, PC_RunningTime* rt, Matrix* A, Matrix* B, Matrix* C) {
+	auto run = [](std::string name, RunningTimeCounter* rt, Matrix* A, Matrix* B, Matrix* C) {
 		rt->Start();
 		*C = (*A) * (*B);
 		rt->End();
+
 		std::chrono::duration<double> sec = rt->GetDuration<std::chrono::duration<double>>();
-		std::cout << "** Performance count finished. [" << name.c_str() << "] : " << sec.count() << " sec" << std::endl;
+		std::string message = "Performance count finished. [" + name + "] : ";
+		message.append(std::to_string(sec.count()));
+		message.append(" sec");
+		Progress::Message(message);
 	};
 
-	std::cout << "** Performance count started. size : " << n << std::endl;
+	std::string message = "Performance count started. size : ";
+	message.append(std::to_string(n));
+	Progress::Message(message);
 
-	std::thread naiveThread(run, std::string("naive"), &naiveRT, &A_1, &B_1, &naive);
+	std::thread naiveThread(run, std::string("naive"), &naiveRTC, &A_1, &B_1, &naive);
 
 	// strassen
 	double strassenSec = 0.0; // total duration of strassen
 	{
 		std::size_t half = n / 2;
 
-		auto runStrassen1 = [](PC_RunningTime* rt, Matrix* A, std::size_t A_row1, std::size_t A_col1, std::size_t A_row2, std::size_t A_col2, Matrix::Calculate A_cal,
+		auto runStrassen1 = [](RunningTimeCounter* rt, Matrix* A, std::size_t A_row1, std::size_t A_col1, std::size_t A_row2, std::size_t A_col2, Matrix::Calculate A_cal,
 			Matrix* B, std::size_t B_row1, std::size_t B_col1, std::size_t B_row2, std::size_t B_col2, Matrix::Calculate B_cal, std::size_t size, Matrix** M)
 		{
 			rt->Start();
@@ -455,7 +457,7 @@ int main()
 			rt->End();
 		};
 
-		auto runStrassen2 = [](PC_RunningTime* rt, Matrix* A, std::size_t A_row1, std::size_t A_col1, std::size_t A_row2, std::size_t A_col2, Matrix::Calculate A_cal,
+		auto runStrassen2 = [](RunningTimeCounter* rt, Matrix* A, std::size_t A_row1, std::size_t A_col1, std::size_t A_row2, std::size_t A_col2, Matrix::Calculate A_cal,
 			Matrix* B, std::size_t B_row, std::size_t B_col, std::size_t size, Matrix** M)
 		{
 			rt->Start();
@@ -464,7 +466,7 @@ int main()
 			rt->End();
 		};
 
-		auto runStrassen3 = [](PC_RunningTime* rt, Matrix* A, std::size_t A_row, std::size_t A_col,
+		auto runStrassen3 = [](RunningTimeCounter* rt, Matrix* A, std::size_t A_row, std::size_t A_col,
 			Matrix* B, std::size_t B_row1, std::size_t B_col1, std::size_t B_row2, std::size_t B_col2, Matrix::Calculate B_cal, std::size_t size, Matrix** M)
 		{
 			rt->Start();
@@ -473,36 +475,36 @@ int main()
 			rt->End();
 		};
 
-		PC_RunningTime M7_RT;
+		RunningTimeCounter M7_RT;
 
 		// M1
 		Matrix* M1 = nullptr;
-		PC_RunningTime M1_RT;
+		RunningTimeCounter M1_RT;
 		std::thread tM1(runStrassen1, &M1_RT, &A_2, 0, 0, half, half, Matrix::Add, &B_2, 0, 0, half, half, Matrix::Add, half, &M1);
 
 		// M2
 		Matrix* M2 = nullptr;
-		PC_RunningTime M2_RT;
+		RunningTimeCounter M2_RT;
 		std::thread tM2(runStrassen2, &M2_RT, &A_2, half, 0, half, half, Matrix::Add, &B_2, 0, 0, half, &M2);
 
 		// M3
 		Matrix* M3 = nullptr;
-		PC_RunningTime M3_RT;
+		RunningTimeCounter M3_RT;
 		std::thread tM3(runStrassen3, &M3_RT, &A_2, 0, 0, &B_2, 0, half, half, half, Matrix::Sub, half, &M3);
 
 		// M4
 		Matrix* M4 = nullptr;
-		PC_RunningTime M4_RT;
+		RunningTimeCounter M4_RT;
 		std::thread tM4(runStrassen3, &M4_RT, &A_2, half, half, &B_2, half, 0, 0, 0, Matrix::Sub, half, &M4);
 
 		// M5
 		Matrix* M5 = nullptr;
-		PC_RunningTime M5_RT;
+		RunningTimeCounter M5_RT;
 		std::thread tM5(runStrassen2, &M5_RT, &A_2, 0, 0, 0, half, Matrix::Add, &B_2, half, half, half, &M5);
 
 		// M6
 		Matrix* M6 = nullptr;
-		PC_RunningTime M6_RT;
+		RunningTimeCounter M6_RT;
 		std::thread tM6(runStrassen1, &M6_RT, &A_2, half, 0, 0, 0, Matrix::Sub, &B_2, 0, 0, 0, half, Matrix::Add, half, &M6);
 
 		// M7
@@ -572,32 +574,45 @@ int main()
 		strassenSec += M5_RT.GetDuration<std::chrono::duration<double>>().count();
 		strassenSec += M6_RT.GetDuration<std::chrono::duration<double>>().count();
 
-		std::cout << "** Performance count finished. [strassen] : " << strassenSec << " sec" << std::endl;
+		message = "Performance count finished. [strassen] : ";
+		message.append(std::to_string(strassenSec));
+		message.append(" sec");
+		Progress::Message(message);
 	}
 
 	//strassen = A_2 * B_2;
 
 	naiveThread.join();
 
-	std::cout << "** All performance count finished." << std::endl;
-	std::chrono::duration<double> naiveSec = naiveRT.GetDuration<std::chrono::duration<double>>();
-	/*std::cout << "** Naive duration time : " << naiveSec.count() << " sec" << std::endl;
-	std::cout << "** Strassen duration time : " << strassenSec << " sec" << std::endl;*/
+	Progress::Message("All performance count finished.");
+	std::chrono::duration<double> naiveSec = naiveRTC.GetDuration<std::chrono::duration<double>>();
+	message = "Naive duration time : ";
+	message.append(std::to_string(naiveSec.count()));
+	message.append(" sec");
+	Progress::Message(message);
+	message = "Strassen duration time : ";
+	message.append(std::to_string(strassenSec));
+	message.append(" sec");
+	Progress::Message(message);
 
 	if (naive == strassen)
 	{
-		std::cout << "** Result : same (succeeded)" << std::endl;
+		Progress::Message("Result : same (succeeded)");
 		//std::cout << "** Matrix strassen" << std::endl;
 		//strassen.Print(5);
 	}
 	else
 	{
-		std::cout << "** result : different (failed)" << std::endl;
+		Progress::Message("Result : different (failed)");
 		//std::cout << "** Matrix naive" << std::endl;
 		//naive.Print(5);
 		//std::cout << "** Matrix strassen" << std::endl;
 		//strassen.Print(5);
 	}
+
+	std::this_thread::sleep_for(std::chrono::seconds(1));
+
+	Progress::Finalize();
 
 	/*
 	std::size_t n = 4;

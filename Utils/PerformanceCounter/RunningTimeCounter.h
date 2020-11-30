@@ -2,14 +2,14 @@
 
 #include <chrono>
 
-class PC_RunningTime
+class RunningTimeCounter
 {
 private:
 	std::chrono::system_clock::time_point _start;
 	std::chrono::system_clock::time_point _end;
 
 public:
-	PC_RunningTime()
+	RunningTimeCounter()
 	{
 		Start();
 	}
