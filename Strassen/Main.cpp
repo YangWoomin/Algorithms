@@ -5,6 +5,7 @@
 #include <string>
 #include <cmath>
 #include <thread>
+#include <mutex>
 
 #include "../Utils/PerformanceCounter/RunningTime.h"
 
@@ -32,7 +33,10 @@ private:
 	Value** _values = nullptr;
 	std::size_t _size = 0;
 	std::size_t _n = 0;
+
 	bool _useStrassen = false;
+	std::mutex* _lock = nullptr;
+	std::string _name;
 
 	void SetSizeToPowOf2()
 	{
@@ -60,6 +64,8 @@ private:
 		_size = 0;
 		_n = 0;
 		_useStrassen = false;
+		_name = "";
+		_lock = nullptr;
 	}
 
 	void Copy(const Matrix& other)
@@ -67,15 +73,14 @@ private:
 		_size = other._size;
 		_n = other._n;
 		_useStrassen = other._useStrassen;
+		_name = other._name;
+		_lock = other._lock;
 
 		_values = new Value * [_size];
 		for (std::size_t i = 0; i < _size; ++i)
 		{
 			_values[i] = new Value[_size];
-			for (std::size_t j = 0; j < _size; ++j)
-			{
-				_values[i][j] = other[i][j];
-			}
+			memcpy(_values[i], other[i], _size);
 		}
 	}
 
@@ -106,10 +111,7 @@ public:
 		for (std::size_t i = 0; i < _size; ++i)
 		{
 			_values[i] = new Value[_size];
-			for (std::size_t j = 0; j < _size; ++j)
-			{
-				_values[i][j] = 0;
-			}
+			memset(_values[i], 0, _size);
 		}
 	}
 
@@ -178,6 +180,12 @@ public:
 					}
 					(*this)[i][j] = sum;
 				}
+
+				if (nullptr != _lock)
+				{
+					std::lock_guard<std::mutex> guard(*_lock);
+					std::cout << "** Progress of " << (_name.empty() ? "empty" : _name.c_str()) << " : " << (double)i / _size << std::endl;
+				}
 			}
 		}
 		else
@@ -198,6 +206,16 @@ public:
 	void SetUseStrassen(bool value)
 	{
 		_useStrassen = value;
+	}
+
+	void SetLock(std::mutex* lock)
+	{
+		_lock = lock;
+	}
+
+	void SetName(std::string name)
+	{
+		_name = name;
 	}
 
 	void Print(std::size_t width) const
@@ -256,10 +274,7 @@ public:
 		for (std::size_t i = 0; i < _size; ++i)
 		{
 			_values[i] = new Value[_size];
-			for (std::size_t j = 0; j < _size; ++j)
-			{
-				_values[i][j] = other[row + i][col + j];
-			}
+			memcpy(_values[i], other[row + i] + col, _size);
 		}
 	}
 
@@ -304,21 +319,37 @@ public:
 			M7.Strassen(Matrix(other, otherRow + half, otherCol, otherRow + half, otherCol + half, half, Add), 0, 0, 0, 0); // M7 *= (B21 + B22)
 
 			// for C11
-			Calc(M1, 0, half, 0, half, Set); // C11 = M1
+			//Calc(M1, 0, half, 0, half, Set); // C11 = M1
+			for (std::size_t i = 0; i < half; ++i)
+			{
+				memcpy(_values[i], M1[i], half);
+			}
 			Calc(M4, 0, half, 0, half, Add); // C11 += M4
 			Calc(M5, 0, half, 0, half, Sub); // C11 -= M5
 			Calc(M7, 0, half, 0, half, Add); // C11 += M7
 
 			// for C12
-			Calc(M3, 0, half, half, half, Set); // C12 = M3
+			//Calc(M3, 0, half, half, half, Set); // C12 = M3
+			for (std::size_t i = 0; i < half; ++i)
+			{
+				memcpy(_values[i] + half, M3[i], half);
+			}
 			Calc(M5, 0, half, half, half, Add); // C12 += M5
 
 			// for C21
-			Calc(M2, half, half, 0, half, Set); // C21 = M2
+			//Calc(M2, half, half, 0, half, Set); // C21 = M2
+			for (std::size_t i = 0; i < half; ++i)
+			{
+				memcpy(_values[half + i], M2[i], half);
+			}
 			Calc(M4, half, half, 0, half, Add); // C21 += M4
 
 			// for C22
-			Calc(M1, half, half, half, half, Set); // C22 = M1
+			//Calc(M1, half, half, half, half, Set); // C22 = M1
+			for (std::size_t i = 0; i < half; ++i)
+			{
+				memcpy(_values[half + i] + half, M1[i], half);
+			}
 			Calc(M2, half, half, half, half, Sub); // C22 -= M2
 			Calc(M3, half, half, half, half, Add); // C22 += M3
 			Calc(M6, half, half, half, half, Add); // C22 += m6
@@ -374,7 +405,7 @@ void PrintMatrix(int** matrix, std::size_t n)
 
 int main()
 {
-	std::size_t n = 256;
+	std::size_t n = 1024 * 16;
 	Matrix A_1(n, -10, 10);
 	Matrix A_2 = A_1;
 	Matrix B_1(n, -10, 10);
@@ -387,6 +418,12 @@ int main()
 	//std::cout << "** Matrix B" << std::endl;
 	//B_1.Print(5);
 
+	std::mutex lock;
+	//A_1.SetName("naive A");
+	//B_1.SetName("naive B");
+	//A_1.SetLock(&lock);
+	//B_1.SetLock(&lock);
+
 	A_2.SetUseStrassen(true);
 	B_2.SetUseStrassen(true);
 
@@ -396,10 +433,11 @@ int main()
 		rt->Start();
 		*C = (*A) * (*B);
 		rt->End();
-		std::cout << "** Performance count finished : " << name.c_str() << std::endl;
+		std::chrono::duration<double> sec = rt->GetDuration<std::chrono::duration<double>>();
+		std::cout << "** Performance count finished. [" << name.c_str() << "] : " << sec.count() << " sec" << std::endl;
 	};
 
-	std::cout << "** Performance count started." << std::endl;
+	std::cout << "** Performance count started. size : " << n << std::endl;
 
 	std::thread naiveThread(run, std::string("naive"), &naiveRT, &A_1, &B_1, &naive);
 
@@ -484,21 +522,37 @@ int main()
 		M7_RT.Start();
 
 		// C11
-		strassen.Calc(*M1, 0, half, 0, half, Matrix::Set); // C11 = M1
+		//strassen.Calc(*M1, 0, half, 0, half, Matrix::Set); // C11 = M1
+		for (std::size_t i = 0; i < half; ++i)
+		{
+			memcpy(strassen[i], (*M1)[i], half);
+		}
 		strassen.Calc(*M4, 0, half, 0, half, Matrix::Add); // C11 += M4
 		strassen.Calc(*M5, 0, half, 0, half, Matrix::Sub); // C11 -= M5
 		strassen.Calc(M7, 0, half, 0, half, Matrix::Add); // C11 += M7
 
 		// C12
-		strassen.Calc(*M3, 0, half, half, half, Matrix::Set); // C12 = M3
+		//strassen.Calc(*M3, 0, half, half, half, Matrix::Set); // C12 = M3
+		for (std::size_t i = 0; i < half; ++i)
+		{
+			memcpy(strassen[i] + half, (*M3)[i], half);
+		}
 		strassen.Calc(*M5, 0, half, half, half, Matrix::Add); // C12 += M5
 
 		// C21
-		strassen.Calc(*M2, half, half, 0, half, Matrix::Set); // C21 = M2
+		//strassen.Calc(*M2, half, half, 0, half, Matrix::Set); // C21 = M2
+		for (std::size_t i = 0; i < half; ++i)
+		{
+			memcpy(strassen[half + i], (*M2)[i], half);
+		}
 		strassen.Calc(*M4, half, half, 0, half, Matrix::Add); // C21 += M4
 
 		// C22
-		strassen.Calc(*M1, half, half, half, half, Matrix::Set); // C22 = M1
+		//strassen.Calc(*M1, half, half, half, half, Matrix::Set); // C22 = M1
+		for (std::size_t i = 0; i < half; ++i)
+		{
+			memcpy(strassen[half + i] + half, (*M1)[i], half);
+		}
 		strassen.Calc(*M2, half, half, half, half, Matrix::Sub); // C22 -= M2
 		strassen.Calc(*M3, half, half, half, half, Matrix::Add); // C22 += M3
 		strassen.Calc(*M6, half, half, half, half, Matrix::Add); // C22 += M6
@@ -518,7 +572,7 @@ int main()
 		strassenSec += M5_RT.GetDuration<std::chrono::duration<double>>().count();
 		strassenSec += M6_RT.GetDuration<std::chrono::duration<double>>().count();
 
-		std::cout << "** Performance count finished : strassen" << std::endl;
+		std::cout << "** Performance count finished. [strassen] : " << strassenSec << " sec" << std::endl;
 	}
 
 	//strassen = A_2 * B_2;
@@ -527,8 +581,8 @@ int main()
 
 	std::cout << "** All performance count finished." << std::endl;
 	std::chrono::duration<double> naiveSec = naiveRT.GetDuration<std::chrono::duration<double>>();
-	std::cout << "** Naive duration time : " << naiveSec.count() << " sec" << std::endl;
-	std::cout << "** Strassen duration time : " << strassenSec << " sec" << std::endl;
+	/*std::cout << "** Naive duration time : " << naiveSec.count() << " sec" << std::endl;
+	std::cout << "** Strassen duration time : " << strassenSec << " sec" << std::endl;*/
 
 	if (naive == strassen)
 	{
