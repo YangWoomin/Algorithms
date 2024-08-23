@@ -1,2 +1,3 @@
 # Algorithms
-![뇌를자극하는알고리즘](https://github.com/user-attachments/assets/b62e6884-5ca0-4a86-8a6c-16c02d61fc9d)
+![뇌를자극하는알고리즘](https://github.com/user-attachments/assets/7bfc5a27-1c4e-4477-a215-96cfde39cd2d)
+
